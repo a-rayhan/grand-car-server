@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
 const app = express();
@@ -33,6 +33,13 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/cardata/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await carCollection.findOne(query);
+            res.send(result);
+        })
+
         app.post('/cardata', async (req, res) => {
             const newCarData = req.body;
             console.log(newCarData);
@@ -41,7 +48,25 @@ async function run() {
             res.send(result);
         })
 
-
+        app.put('/cardata/:id', async (req, res) => {
+            const id = req.params.id;
+            const carData = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateData = {
+                $set: {
+                    name: carData.name,
+                    brand: carData.brand,
+                    type: carData.type,
+                    price: carData.price,
+                    rating: carData.rating,
+                    photo: carData.photo,
+                    details: carData.details
+                }
+            }
+            const result = await carCollection.updateOne(filter, updateData, options);
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
