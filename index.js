@@ -68,6 +68,19 @@ async function run() {
             res.send(result);
         })
 
+        app.patch('/cardata', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updateDoc = {
+                $set: {
+                    email: user.email
+                }
+            }
+
+            const result = await carCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
