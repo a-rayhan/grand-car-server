@@ -26,6 +26,7 @@ async function run() {
         await client.connect();
 
         const carCollection = client.db("carDb").collection("car");
+        const cartCollection = client.db("carDb").collection("cart");
 
         app.get('/cardata', async (req, res) => {
             const cursor = carCollection.find();
@@ -68,23 +69,23 @@ async function run() {
             res.send(result);
         })
 
-        app.patch('/cardata', async (req, res) => {
-            const user = req.body;
-            const filter = { email: user.email };
-            const updateDoc = {
-                $set: {
-                    email: user.email
-                }
-            }
-
-            const result = await carCollection.updateOne(filter, updateDoc);
-            res.send(result);
+        // userCart
+        app.get('/cartdata', async (req, res) => {
+            const cursor = cartCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
         })
 
-        app.delete('/cardata/:id', async (req, res) => {
+        app.post('/cartdata', async (req, res) => {
+            const cartItem = req.body;
+            const result = await cartCollection.insertOne(cartItem);
+            res.send(result)
+        })
+
+        app.delete('/cartdata/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
-            const result = await carCollection.deleteOne(query);
+            const result = await cartCollection.deleteOne(query);
             res.send(result);
         })
 
